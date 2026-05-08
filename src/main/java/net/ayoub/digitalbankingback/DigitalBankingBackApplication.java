@@ -1,9 +1,6 @@
 package net.ayoub.digitalbankingback;
 
-import net.ayoub.digitalbankingback.entities.AccountOperation;
-import net.ayoub.digitalbankingback.entities.CurrentAccount;
-import net.ayoub.digitalbankingback.entities.Customer;
-import net.ayoub.digitalbankingback.entities.SavingAccount;
+import net.ayoub.digitalbankingback.entities.*;
 import net.ayoub.digitalbankingback.enums.AccountStatus;
 import net.ayoub.digitalbankingback.enums.OperationType;
 import net.ayoub.digitalbankingback.repositories.AccountOperationRepository;
@@ -27,6 +24,32 @@ public class DigitalBankingBackApplication {
     }
 
     @Bean
+    CommandLineRunner start(BanckAccountRepository banckAccountRepository){
+        return args -> {
+            BankAccount bankAccount = banckAccountRepository.findById("502c0dc1-f067-47c4-a98f-5d9f2825df8e").orElse(null);
+            if (bankAccount != null ){
+                System.out.println("****************************************** Bank Account ******************************* ");
+                System.out.println(bankAccount.getId());
+                System.out.println(bankAccount.getStatus());
+                System.out.println(bankAccount.getBalance());
+                System.out.println(bankAccount.getCreatedAt());
+                System.out.println(bankAccount.getCustomer().getName());
+                System.out.println(bankAccount.getClass().getName());
+                if(bankAccount instanceof CurrentAccount){
+                    System.out.println("Over-Draft => " + ((CurrentAccount)bankAccount).getOverDraft());
+                } else if (bankAccount instanceof SavingAccount) {
+                    System.out.println("InterestRate => " + ((SavingAccount)bankAccount).getInterestRate());
+                }
+                System.out.println("****************************************** Operations sur L'account " +bankAccount.getId()+ " ******************************* ");
+                bankAccount.getAccountOperations().forEach(accountOperation -> {
+                    System.out.println("********************************");
+                    System.out.println(accountOperation.getOperationDate() + "\t" + accountOperation.getType() + "\t" +accountOperation.getAmount());
+                });
+            }
+        };
+    }
+
+    //@Bean
     CommandLineRunner start(CustomerRepository customerRepository ,
                             BanckAccountRepository banckAccountRepository,
                             AccountOperationRepository accountOperationRepository){
@@ -71,7 +94,6 @@ public class DigitalBankingBackApplication {
                     accountOperationRepository.save(accountOperation);
                  }
             });
-
         };
     }
 
