@@ -1,5 +1,6 @@
 package net.ayoub.digitalbankingback;
 
+import net.ayoub.digitalbankingback.dtos.CustomerDTO;
 import net.ayoub.digitalbankingback.entities.*;
 import net.ayoub.digitalbankingback.enums.AccountStatus;
 import net.ayoub.digitalbankingback.enums.OperationType;
@@ -32,7 +33,7 @@ public class DigitalBankingBackApplication {
     CommandLineRunner start(BankAccountService iBankAccountService, BankAccountServiceImp bankAccountServiceImp){
         return  args -> {
             Stream.of("Hassan","Ali","Ibrahim","Ahmed").forEach(name->{
-                Customer customer = new Customer();
+                CustomerDTO customer = new CustomerDTO();
                 customer.setName(name);
                 customer.setEmail(name+"@gmail.com");
                 iBankAccountService.saveCustomer(customer);
