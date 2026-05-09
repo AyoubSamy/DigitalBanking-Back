@@ -10,7 +10,7 @@ import net.ayoub.digitalbankingback.exceptions.customerNotfoundException;
 
 import java.util.List;
 
-public interface IBankAccountService {
+public interface BankAccountService {
 
     Customer saveCustomer(Customer customer);
 
@@ -28,4 +28,5 @@ public interface IBankAccountService {
 
     void transfert(String accountIdSource ,String accountIdDestination , double amount) throws BankAccountNotFoundException, EnoughAmountException;
 
+    List<BankAccount> listAccounts();
 }

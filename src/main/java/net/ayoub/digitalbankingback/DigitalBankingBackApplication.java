@@ -3,16 +3,21 @@ package net.ayoub.digitalbankingback;
 import net.ayoub.digitalbankingback.entities.*;
 import net.ayoub.digitalbankingback.enums.AccountStatus;
 import net.ayoub.digitalbankingback.enums.OperationType;
+import net.ayoub.digitalbankingback.exceptions.BankAccountNotFoundException;
+import net.ayoub.digitalbankingback.exceptions.EnoughAmountException;
+import net.ayoub.digitalbankingback.exceptions.customerNotfoundException;
 import net.ayoub.digitalbankingback.repositories.AccountOperationRepository;
 import net.ayoub.digitalbankingback.repositories.BanckAccountRepository;
 import net.ayoub.digitalbankingback.repositories.CustomerRepository;
-import org.aspectj.weaver.NewConstructorTypeMunger;
+import net.ayoub.digitalbankingback.services.BankAccountServiceImp;
+import net.ayoub.digitalbankingback.services.BankAccountService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -24,6 +29,42 @@ public class DigitalBankingBackApplication {
     }
 
     @Bean
+    CommandLineRunner start(BankAccountService iBankAccountService, BankAccountServiceImp bankAccountServiceImp){
+        return  args -> {
+            Stream.of("Hassan","Ali","Ibrahim","Ahmed").forEach(name->{
+                Customer customer = new Customer();
+                customer.setName(name);
+                customer.setEmail(name+"@gmail.com");
+                iBankAccountService.saveCustomer(customer);
+            });
+
+            iBankAccountService.listCustomer().forEach(customer -> {
+                try {
+                    iBankAccountService.saveCurrentBankAccount(Math.random()*1500000,900.0,customer.getId());
+                    iBankAccountService.saveSavingBankAccount(Math.random()*10000,5.5,customer.getId());
+                    List<BankAccount> bankAccounts = iBankAccountService.listAccounts();
+
+                    for (BankAccount bankAccount : bankAccounts){
+                        for (int i = 0; i < 10; i++) {
+                            iBankAccountService.credit(bankAccount.getId(),1000+Math.random()*90000,"CREDIT");
+                            iBankAccountService.debit(bankAccount.getId(),1000+Math.random()*1000,"DEBIT");
+                        }
+                    }
+                } catch (customerNotfoundException e) {
+                    e.printStackTrace();
+                } catch (BankAccountNotFoundException | EnoughAmountException e) {
+                    e.printStackTrace();
+                }
+            });
+
+
+
+        };
+    }
+
+
+
+    //@Bean
     CommandLineRunner start(BanckAccountRepository banckAccountRepository){
         return args -> {
             BankAccount bankAccount = banckAccountRepository.findById("502c0dc1-f067-47c4-a98f-5d9f2825df8e").orElse(null);

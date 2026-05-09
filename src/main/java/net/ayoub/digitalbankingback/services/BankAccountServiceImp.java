@@ -12,9 +12,6 @@ import net.ayoub.digitalbankingback.exceptions.customerNotfoundException;
 import net.ayoub.digitalbankingback.repositories.AccountOperationRepository;
 import net.ayoub.digitalbankingback.repositories.BanckAccountRepository;
 import net.ayoub.digitalbankingback.repositories.CustomerRepository;
-import org.apache.catalina.authenticator.SavedRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -25,7 +22,7 @@ import java.util.UUID;
 @Transactional
 @AllArgsConstructor
 @Slf4j
-public class BankAccountServiceImp implements IBankAccountService {
+public class BankAccountServiceImp implements BankAccountService {
 
     private AccountOperationRepository accountOperationRepository;
 
@@ -125,8 +122,6 @@ public class BankAccountServiceImp implements IBankAccountService {
     @Override
     public void credit(String accountId, double amount, String Description) throws BankAccountNotFoundException, EnoughAmountException {
         BankAccount bankAccount = getBankAccount(accountId);
-        if ( bankAccount.getBalance() < amount )
-            throw new EnoughAmountException("Balance Not Sufficient");
 
         AccountOperation accountOperation = new AccountOperation();
 
@@ -148,6 +143,10 @@ public class BankAccountServiceImp implements IBankAccountService {
     public void transfert(String accountIdSource, String accountIdDestination, double amount) throws BankAccountNotFoundException, EnoughAmountException {
         debit(accountIdSource,amount,"transfer to " + accountIdDestination);
         credit(accountIdDestination,amount,"transfer from "+accountIdSource);
+    }
 
+    @Override
+    public List<BankAccount> listAccounts(){
+        return banckAccountRepository.findAll();
     }
 }
