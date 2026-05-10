@@ -1,6 +1,9 @@
 package net.ayoub.digitalbankingback;
 
+import net.ayoub.digitalbankingback.dtos.BankAccountDTO;
+import net.ayoub.digitalbankingback.dtos.CurrentBankAccountDto;
 import net.ayoub.digitalbankingback.dtos.CustomerDTO;
+import net.ayoub.digitalbankingback.dtos.SavingBankAccountDto;
 import net.ayoub.digitalbankingback.entities.*;
 import net.ayoub.digitalbankingback.enums.AccountStatus;
 import net.ayoub.digitalbankingback.enums.OperationType;
@@ -30,7 +33,7 @@ public class DigitalBankingBackApplication {
     }
 
     @Bean
-    CommandLineRunner start(BankAccountService iBankAccountService, BankAccountServiceImp bankAccountServiceImp){
+    CommandLineRunner start(BankAccountService iBankAccountService, BankAccountServiceImp bankAccountServiceImp, BankAccountService bankAccountService){
         return  args -> {
             Stream.of("Hassan","Ali","Ibrahim","Ahmed").forEach(name->{
                 CustomerDTO customer = new CustomerDTO();
@@ -43,12 +46,18 @@ public class DigitalBankingBackApplication {
                 try {
                     iBankAccountService.saveCurrentBankAccount(Math.random()*1500000,900.0,customer.getId());
                     iBankAccountService.saveSavingBankAccount(Math.random()*10000,5.5,customer.getId());
-                    List<BankAccount> bankAccounts = iBankAccountService.listAccounts();
+                    List<BankAccountDTO> bankAccounts = iBankAccountService.listAccounts();
 
-                    for (BankAccount bankAccount : bankAccounts){
+                    for (BankAccountDTO bankAccount : bankAccounts){
                         for (int i = 0; i < 10; i++) {
-                            iBankAccountService.credit(bankAccount.getId(),1000+Math.random()*90000,"CREDIT");
-                            iBankAccountService.debit(bankAccount.getId(),1000+Math.random()*1000,"DEBIT");
+                            String accountId;
+                            if(bankAccount instanceof SavingBankAccountDto){
+                                accountId=((SavingBankAccountDto) bankAccount).getId();
+                            } else{
+                                accountId=((CurrentBankAccountDto) bankAccount).getId();
+                            }
+                            iBankAccountService.credit(accountId,1000+Math.random()*90000,"CREDIT");
+                            iBankAccountService.debit(accountId,1000+Math.random()*1000,"DEBIT");
                         }
                     }
                 } catch (customerNotfoundException e) {

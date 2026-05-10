@@ -1,6 +1,6 @@
 package net.ayoub.digitalbankingback.services;
 
-import net.ayoub.digitalbankingback.dtos.CustomerDTO;
+import net.ayoub.digitalbankingback.dtos.*;
 import net.ayoub.digitalbankingback.entities.BankAccount;
 import net.ayoub.digitalbankingback.entities.CurrentAccount;
 import net.ayoub.digitalbankingback.entities.Customer;
@@ -15,13 +15,13 @@ public interface BankAccountService {
 
     CustomerDTO saveCustomer(CustomerDTO customerDTO);
 
-    CurrentAccount saveCurrentBankAccount(Double initialBalance , Double OverDraft, Long CustomerId) throws customerNotfoundException;
+    CurrentBankAccountDto saveCurrentBankAccount(Double initialBalance , Double OverDraft, Long CustomerId) throws customerNotfoundException;
 
-    SavingAccount saveSavingBankAccount(Double initialBalance , Double InterstRate, Long CustomerId) throws customerNotfoundException;
+    SavingBankAccountDto saveSavingBankAccount(Double initialBalance , Double InterstRate, Long CustomerId) throws customerNotfoundException;
 
     List<CustomerDTO> listCustomer();
 
-    BankAccount getBankAccount(String BankAccountID) throws BankAccountNotFoundException;
+    BankAccountDTO getBankAccount(String BankAccountID) throws BankAccountNotFoundException;
 
     void debit(String accountId , double amount , String Description) throws BankAccountNotFoundException, EnoughAmountException;
 
@@ -29,11 +29,15 @@ public interface BankAccountService {
 
     void transfert(String accountIdSource ,String accountIdDestination , double amount) throws BankAccountNotFoundException, EnoughAmountException;
 
-    List<BankAccount> listAccounts();
+    List<BankAccountDTO> listAccounts();
 
     CustomerDTO getCustomer(Long CustomerId) throws customerNotfoundException;
 
     CustomerDTO updateCustomer(CustomerDTO customerDTO);
 
     void deletCustomer(Long customerId);
+
+    List<AccountOperationDTO> accountHistory(String accountId);
+
+    AccountHistoryDTO getAccountHistory(String accountId, int page, int size) throws BankAccountNotFoundException;
 }
