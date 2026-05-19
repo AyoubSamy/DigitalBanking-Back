@@ -164,7 +164,7 @@ public class BankAccountServiceImp implements BankAccountService {
     }
 
     @Override
-    public void transfert(String accountIdSource, String accountIdDestination, double amount) throws BankAccountNotFoundException, EnoughAmountException {
+    public void transfer(String accountIdSource, String accountIdDestination, double amount) throws BankAccountNotFoundException, EnoughAmountException {
         debit(accountIdSource,amount,"transfer to " + accountIdDestination);
         credit(accountIdDestination,amount,"transfer from "+accountIdSource);
     }
@@ -225,5 +225,12 @@ public class BankAccountServiceImp implements BankAccountService {
         accountHistoryDTO.setPageSize(size);
         accountHistoryDTO.setTotalPages(accountOperations.getTotalPages());
         return accountHistoryDTO;
+    }
+
+    @Override
+    public List<CustomerDTO> searchCustomers(String keyword) {
+        List<Customer> customers=customerRepository.searchCustomer(keyword);
+        List<CustomerDTO> customerDTOS = customers.stream().map(cust -> DtoMapper.fromCustomer(cust)).collect(Collectors.toList());
+        return customerDTOS;
     }
 }

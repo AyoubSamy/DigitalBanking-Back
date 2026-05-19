@@ -9,13 +9,12 @@ import net.ayoub.digitalbankingback.services.BankAccountService;
 import net.ayoub.digitalbankingback.services.BankAccountServiceImp;
 import org.springframework.web.bind.annotation.*;
 
-import javax.lang.model.element.Name;
 import java.util.List;
-import java.util.function.LongFunction;
 
 @RestController
 @AllArgsConstructor
 @Slf4j
+@CrossOrigin("*")    
 public class CustomerRestController {
     private BankAccountService bankAccountService;
 
@@ -28,6 +27,12 @@ public class CustomerRestController {
     public CustomerDTO GetCustomer(@PathVariable(name = "id") Long customerId) throws customerNotfoundException {
         return bankAccountService.getCustomer(customerId);
     }
+
+    @GetMapping("/customers/search")
+    public List<CustomerDTO> searchCustomers(@RequestParam(name = "keyword",defaultValue = "") String keyword){
+        return bankAccountService.searchCustomers("%"+keyword+"%");
+    }
+
     @PostMapping("/customers")
     public CustomerDTO SaveCustomer(@RequestBody CustomerDTO customerDTO){
         return bankAccountService.saveCustomer(customerDTO);

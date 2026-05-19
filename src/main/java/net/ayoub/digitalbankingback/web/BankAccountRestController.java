@@ -1,20 +1,17 @@
 package net.ayoub.digitalbankingback.web;
 
 import lombok.AllArgsConstructor;
-import net.ayoub.digitalbankingback.dtos.AccountHistoryDTO;
-import net.ayoub.digitalbankingback.dtos.AccountOperationDTO;
-import net.ayoub.digitalbankingback.dtos.BankAccountDTO;
+import net.ayoub.digitalbankingback.dtos.*;
 import net.ayoub.digitalbankingback.exceptions.BankAccountNotFoundException;
+import net.ayoub.digitalbankingback.exceptions.EnoughAmountException;
 import net.ayoub.digitalbankingback.services.BankAccountService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@CrossOrigin("*")
 public class BankAccountRestController {
     public BankAccountService bankAccountService;
 
@@ -39,6 +36,26 @@ public class BankAccountRestController {
             @RequestParam(name="page",defaultValue = "0") int page,
             @RequestParam(name="size",defaultValue = "5")int size) throws BankAccountNotFoundException {
         return bankAccountService.getAccountHistory(accountId,page,size);
+    }
+
+    @PostMapping("/accounts/debit")
+    public DebitDTO debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, EnoughAmountException {
+        this.bankAccountService.debit(debitDTO.getAccountId(),debitDTO.getAmount(),debitDTO.getDescription());
+        return debitDTO;
+    }
+
+    @PostMapping("/accounts/credit")
+    public CreditDTO credit(@RequestBody CreditDTO creditDTO) throws BankAccountNotFoundException, EnoughAmountException {
+        this.bankAccountService.credit(creditDTO.getAccountId(),creditDTO.getAmount(),creditDTO.getDescription());
+        return creditDTO;
+    }
+
+    @PostMapping("/accounts/transfer")
+    public void transfer(@RequestBody TransferRequestDTO transferRequestDTO) throws BankAccountNotFoundException, EnoughAmountException {
+        this.bankAccountService.transfer(
+                transferRequestDTO.getAccountSource(),
+                transferRequestDTO.getAccountDestination(),
+                transferRequestDTO.getAmount());
     }
 
 
